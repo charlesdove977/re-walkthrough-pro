@@ -1,32 +1,36 @@
 <p align="center">
-  <img src="docs/hero.png" alt="RE Walkthrough Pro — cinematic Airbnb-to-video listing walkthroughs for Claude Code" width="900">
+  <img src="docs/hero.png" alt="Walkthrough Pro — cinematic walkthroughs and ads from any photo source, inside Claude Code" width="900">
 </p>
 
-# Airbnb Walkthrough Pro
+# Walkthrough Pro
 
-> Turn an Airbnb listing into a cinematic, room-by-room walkthrough video — right inside [Claude Code](https://claude.ai/code). Apify pulls the photos, Higgsfield animates each room, ffmpeg stitches the final cut. Built to sell to short-term-rental hosts and property managers.
+> One Claude Code skill that turns any photo source into a cinematic video. Paste an **Airbnb** or **Booking.com** listing URL, or drop your own **product / business photos**, and get back a finished cinematic walkthrough or ad. Apify scrapes when there is a listing, Higgsfield animates every shot, ffmpeg stitches the final cut.
 
 <p>
-  <a href="https://www.charlieautomates.com/charlie-os-vs/"><img src="https://img.shields.io/badge/Work_with_Charlie-Charlie_OS-7c3aed?style=for-the-badge&logo=anthropic&logoColor=white" alt="Work with Charlie"></a>
-  <a href="https://www.npmjs.com/package/airbnb-walkthrough-pro"><img src="https://img.shields.io/npm/v/airbnb-walkthrough-pro?color=blue&label=npm" alt="npm version"></a>
-  <a href="https://www.npmjs.com/package/airbnb-walkthrough-pro"><img src="https://img.shields.io/npm/dt/airbnb-walkthrough-pro?color=blue&label=downloads" alt="npm downloads"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/npm/l/airbnb-walkthrough-pro?color=green" alt="MIT license"></a>
+  <a href="https://www.npmjs.com/package/walkthrough-pro"><img src="https://img.shields.io/npm/v/walkthrough-pro?color=blue&label=npm" alt="npm version"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/npm/l/walkthrough-pro?color=green" alt="MIT license"></a>
   <a href="https://github.com/GiancarloLazazzera/re-walkthrough-pro/stargazers"><img src="https://img.shields.io/github/stars/GiancarloLazazzera/re-walkthrough-pro?style=flat" alt="stars"></a>
 </p>
 
-RE Walkthrough Pro ships the **`re-walkthrough-pro`** skill: a single command that takes an Airbnb listing (or finds you some), pulls every photo, animates each room into a short cinematic camera-move clip, and stitches them into one finished walkthrough video you can hand a host.
+The skill ships as **`/re-walkthrough-pro`** in Claude Code. A single command that handles three subject types:
 
-A finished tour that looks like a $1,000–3,000 production, made from listing photos in minutes, for sub-cents of scraping plus a handful of Higgsfield credits.
+| Subject type | Input | Output |
+|--------------|-------|--------|
+| **STR listing** | Airbnb URL, Booking URL, or self-managed images | Room-by-room cinematic walkthrough |
+| **Product ad** | Your product photos (angles + macro + lifestyle) | Cinematic showcase reel (9:16 default) |
+| **Business ad** | Your restaurant / gym / salon / activity photos | Cinematic promo (16:9 default) |
 
-> **Honest framing:** This produces a *cinematic walkthrough* (per-room camera-move clips stitched together), **not** a true 3D / Matterport reconstruction. It looks premium, and it's impossible without an AI video engine — but don't promise a walkable dollhouse.
+A finished video that looks like a $1,000–3,000 production, made from photos in minutes, for sub-cents of scraping (only if there is a listing to scrape) plus a handful of Higgsfield credits.
+
+> **Honest framing:** This produces a *cinematic walkthrough / ad* (per-shot camera-move clips stitched together), **not** a true 3D / Matterport reconstruction. It looks premium, and it's impossible without an AI video engine — but don't promise a walkable dollhouse.
 
 ---
 
 ## Why
 
-STR hosts and co-hosts pay for media. The bottleneck is production time. Airbnb Walkthrough Pro removes it: one command, listing in → sellable walkthrough out. Drop it into a short-term-rental marketing service as a video line item, or batch tours across a whole city and pitch the hosts.
+Hosts, brands, and local businesses all pay for media. The bottleneck is production time. Walkthrough Pro removes it: one command, photos in → sellable video out. Drop it into a marketing service as a video line item, or batch tours + ads across a whole client list.
 
-The architecture is the unlock. Higgsfield video models work clip-by-clip (~5s image-to-video), so a whole-house walkthrough **must** be per-room clips stitched on your side. This skill does exactly that, with a camera move matched to each room type so the stitched result reads like walking through the home.
+The architecture is the unlock. Higgsfield video models work clip-by-clip (~5s image-to-video), so a whole walkthrough or ad **must** be per-shot clips stitched on your side. This skill does exactly that, with a camera-move library tuned per subject type (rooms, products, business scenes) so the stitched result reads like a real production.
 
 ---
 
@@ -35,21 +39,20 @@ The architecture is the unlock. Higgsfield video models work clip-by-clip (~5s i
 ### Option 1 — `npx` (recommended)
 
 ```bash
-npx airbnb-walkthrough-pro install
+npx walkthrough-pro install
 ```
 
 Installs the skill to `~/.claude/skills/re-walkthrough-pro/`. Refresh after a package upgrade:
 
 ```bash
-npm view airbnb-walkthrough-pro version       # check latest
-npx airbnb-walkthrough-pro@latest update      # refresh in place
+npx walkthrough-pro@latest update
 ```
 
 ### Option 2 — Global install
 
 ```bash
-npm install -g airbnb-walkthrough-pro
-airbnb-walkthrough-pro install
+npm install -g walkthrough-pro
+walkthrough-pro install
 ```
 
 ### Option 3 — Directly from GitHub
@@ -62,14 +65,14 @@ npx github:GiancarloLazazzera/re-walkthrough-pro install
 
 ```bash
 cd ~/path/to/project
-npx airbnb-walkthrough-pro install --project
+npx walkthrough-pro install --project
 ```
 
 ### Uninstall / where
 
 ```bash
-npx airbnb-walkthrough-pro uninstall
-npx airbnb-walkthrough-pro where            # ~/.claude/skills/re-walkthrough-pro
+npx walkthrough-pro uninstall
+npx walkthrough-pro where            # ~/.claude/skills/re-walkthrough-pro
 ```
 
 Restart Claude Code after installing, then run `/re-walkthrough-pro`.
@@ -78,47 +81,53 @@ Restart Claude Code after installing, then run `/re-walkthrough-pro`.
 
 ## What you need
 
-Two MCP servers connected in Claude Code, plus ffmpeg:
-
-- **[Higgsfield MCP](https://higgsfield.ai/s/higgsfield-mcp-v3-earning-series-charlieautomates-ptQTLe)** — required. Animates each room (Seedance 2.0 / Kling 3.0 image-to-video) and reframes for social. Every image + video model in one credit pool.
-- **[Apify account](https://www.apify.com?fpr=charles)** — required for the listing scrape. The Airbnb scraper (`nomad-agent/airbnb-scraper`, mode `detail`) pulls photos + title + nightly price + address + amenities + host in one call. Grab the [Apify MCP server](https://github.com/apify/actors-mcp-server) (`@apify/actors-mcp-server`) and your token at [console.apify.com](https://console.apify.com/settings/integrations).
-- **ffmpeg** — required for stitching (`brew install ffmpeg`).
+- **[Higgsfield MCP](https://higgsfield.ai)** — required for every subject type. Animates each shot (Seedance 2.0 / Kling 3.0 image-to-video) and reframes for social. Every image + video model in one credit pool.
+- **[Apify MCP](https://github.com/apify/actors-mcp-server)** — required *only* if you want to scrape Airbnb or Booking listings. Not needed for manual-image runs (product / business / self-managed STR).
+- **ffmpeg** — required for stitching (`brew install ffmpeg` / `winget install ffmpeg`).
 
 ---
 
 ## How it works
 
 ```
-1. RESOLVE   Airbnb link → Apify airbnb-scraper (photos + title + nightly price + specs + host + amenities)
-             "find 5 in Lisbon" → search mode → detail mode (chained dataset)
-2. PERSIST   write PROPERTY.md, download all photos to source-images/
-3. CURATE    vision pass: best photo per room, drop floorplans/dupes, tag room type
-             (Airbnb doesn't label rooms — this pass is vision-only)
-4. ANIMATE   per room → Higgsfield image-to-video with a room-matched camera move
-5. STITCH    ffmpeg concat in walkthrough order → 16:9 master (+ optional 9:16)
-6. DELIVER   final video + per-room scenes + PROPERTY.md, in one folder
+1. CHOOSE     subject type (str_listing / product_ad / business_ad) + source (airbnb / booking / manual)
+2. INGEST     Airbnb / Booking → Apify actor pulls photos + specs
+              Manual → copy your folder / URLs / attachments into source-images/
+3. PERSIST    write BRIEF.md (listing / product / business variant), populate source-images/
+4. CURATE     vision pass tuned per subject type; drop junk; order the shot list
+5. ANIMATE    per shot → Higgsfield image-to-video with a subject-appropriate camera move
+6. STITCH     ffmpeg concat in shot order → master at chosen ratio (+ optional alt ratio)
+7. DELIVER    final video + per-shot scenes + BRIEF.md, in one folder
 ```
 
-### Two ways in
+### Three ways in
 
-- **Single listing:** paste an Airbnb listing URL (`https://www.airbnb.com/rooms/…`).
-- **Discovery:** "find 5 apartments in Lisbon for 2 guests" → it searches, shows you the listings, you pick.
+- **STR listing URL** — paste an Airbnb (`https://www.airbnb.com/rooms/…`) or Booking (`https://www.booking.com/hotel/…`) link.
+- **Discovery** — "find 5 apartments in Lisbon for 2 guests" or "find 3 boutique hotels in Rome". The skill searches, shows the results, you pick.
+- **Manual images** — drop a folder, a list of paths, a list of URLs, or file attachments. Then answer one question: product, business, or self-managed STR.
 
-### Room → camera move
+### Shot → camera move (per subject type)
 
-Each room type gets a cinematic move (drone approach for the building/exterior, steadicam walkthrough for halls, orbit for great rooms, window-approach reveals for views, rising reveal for the balcony/terrace/pool). The moves are model-agnostic — they apply to whatever Higgsfield video model you pick.
+- **STR listing** — drone approach for the exterior, steadicam for halls, orbit for great rooms, window-approach reveals for views, rising reveal for the balcony / pool.
+- **Product ad** — slow push-in on the hero, short orbit on angles, rack-focus + macro on details, subtle parallax on lifestyle shots.
+- **Business ad** — approach on signage, steadicam interior, shoulder-follow on activity in progress, push-in on product/detail, gentle orbit on vibe.
+
+All camera moves are model-agnostic — they apply to whatever Higgsfield video model you pick.
 
 ---
 
 ## Output
 
 ```
-listing-walkthroughs/<listing-slug>/
-├── PROPERTY.md          title · Airbnb link · nightly price · bedrooms/bathrooms/max-guests · host · amenities · shot list
-├── source-images/       every photo pulled from Airbnb
-├── scenes/              per-room cinematic clips (room-01-exterior.mp4, room-02-living.mp4 …)
-└── final/               walkthrough-16x9.mp4 (+ walkthrough-9x16.mp4 if requested)
+walkthroughs/<subject-slug>/
+├── BRIEF.md             subject-typed brief (listing / product / business variant)
+├── source-images/       every photo used
+├── scenes/              per-shot cinematic clips (shot-01-*.mp4, shot-02-*.mp4 …)
+└── final/               master + optional alt ratio
+                         (walkthrough-16x9.mp4 for STR, ad-9x16.mp4 for product, ad-16x9.mp4 for business)
 ```
+
+Walkthroughs / ads are written to your *project* (`walkthroughs/`), never into the skill folder.
 
 ---
 
@@ -128,52 +137,43 @@ listing-walkthroughs/<listing-slug>/
 ~/.claude/skills/re-walkthrough-pro/
 ├── SKILL.md
 ├── tasks/
-│   └── build-walkthrough.md          ← interview + 7-step pipeline
+│   └── build-walkthrough.md              ← interview + universal 7-step pipeline
 ├── frameworks/
-│   ├── apify-airbnb-actors.md         ← the Airbnb actor stack + how to call it
-│   ├── higgsfield-camera-moves.md     ← room→camera-move mapping (self-sufficient)
-│   └── stitch-pipeline.md             ← ffmpeg normalize/concat + 9:16 reframe
+│   ├── apify-airbnb-actors.md             ← Airbnb actor stack + how to call it
+│   ├── apify-booking-actors.md            ← Booking.com actor stack + how to call it
+│   ├── user-provided-images.md            ← Manual ingest (folder / URLs / attachments)
+│   ├── higgsfield-camera-moves.md         ← Camera-move library (rooms + products + business)
+│   └── stitch-pipeline.md                 ← ffmpeg normalize/concat + alt-ratio reframe
 ├── templates/
-│   └── property-md.md
+│   └── brief-md.md                        ← Three variants (listing / product / business)
 └── checklists/
-    └── walkthrough-quality.md
+    └── walkthrough-quality.md             ← Universal + subject-specific QA
 ```
-
-Walkthroughs are written to your *project* (`listing-walkthroughs/`), never into the skill folder.
-
----
-
-## Optional: richer prompt craft
-
-The built-in camera-move mapping is self-sufficient. If you also have the **`seedance-real-estate`** and **`seedance-cinematic`** skills installed (both ship inside [UGC Factory](https://www.npmjs.com/package/ugc-factory)), the skill invokes them for richer per-room motion prompts and a film-look color grade. Purely additive — nothing breaks without them.
 
 ---
 
 ## FAQ
 
 **Is this true 3D?**
-No. It's per-room cinematic camera-move clips stitched into a tour. Premium-looking, honest to describe as a "cinematic walkthrough," not a Matterport dollhouse.
+No. It's per-shot cinematic camera-move clips stitched into a tour or ad. Premium-looking, honest to describe as a "cinematic walkthrough / ad," not a Matterport dollhouse.
+
+**Do I need Apify for product / business ads?**
+No. Apify is only used when scraping Airbnb or Booking. Manual-image runs skip the scrape entirely.
 
 **Does it touch my repo when I install?**
 No. Default install writes to `~/.claude/skills/re-walkthrough-pro/`. Only `--project` writes into the current directory.
 
-**Does Airbnb block scraping?**
-Airbnb blocks naive `fetch`/headless (bot detection + per-request signed photo URLs), which is exactly why the skill routes images through the Apify actor — the reliable source for both the link and discovery paths.
+**Do Airbnb and Booking block scraping?**
+Yes — both block naive `fetch`/headless. That is why the skill routes photos through Apify actors, the reliable source for the listing paths.
 
 **What does a run cost?**
-The Apify scrape is sub-cent to low-cent per listing. The real cost is Higgsfield credits, scaled by room count — which is why the skill auto-curates to ~6–10 hero rooms by default.
+Scrape is sub-cent to low-cent per listing (nothing for manual runs). The real cost is Higgsfield credits, scaled by shot count — which is why the skill auto-curates to ~6–10 hero shots by default.
 
----
-
-## Related projects
-
-- **[Charlie OS](https://www.charlieautomates.com/charlie-os/)** — one-click Claude Code setup bundling BASE, CARL, PAUL, SEED, Skillsmith, and dozens of curated skills.
-- **[UGC Factory](https://www.npmjs.com/package/ugc-factory)** — AI UGC ad studio; bundles the 15 Seedance genre skills (including the two this skill optionally uses).
-- **[Advertising Ops](https://github.com/charlesdove977/advertising-ops)** — CMO-in-a-box media buyer for Claude Code.
-- **[Work with Charlie](https://www.charlieautomates.com/charlie-os-vs/)** — done-for-you installs, custom skill builds, 1:1 Claude Code engineering.
+**Can I mix inputs in one run?**
+Not in v0.3. One subject per run. You *can* batch many runs back-to-back — the skill folders keep them cleanly separated.
 
 ---
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Built by [Charles J Dove](https://www.charlieautomates.com).
+MIT — see [LICENSE](LICENSE).

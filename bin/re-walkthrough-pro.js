@@ -72,9 +72,9 @@ function install(opts) {
   console.log(`  ${target}`);
   console.log('');
   console.log(`Invoke from Claude Code with:  /${SKILL_NAME}`);
-  console.log(`Then paste an Airbnb listing link, or say "find 5 listings in <place>".`);
+  console.log(`Give it an Airbnb / Booking URL, or drop your own images, and it'll build a cinematic walkthrough or ad.`);
   console.log('');
-  console.log(`Requires: Higgsfield MCP + Apify MCP connected in Claude Code, and ffmpeg installed.`);
+  console.log(`Requires: Higgsfield MCP + (Apify MCP if scraping listings) connected in Claude Code, and ffmpeg installed.`);
 }
 
 function uninstall(opts) {

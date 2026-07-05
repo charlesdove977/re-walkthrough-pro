@@ -1,21 +1,24 @@
 {
-  "name": "airbnb-walkthrough-pro",
-  "version": "0.2.0",
-  "description": "Claude Code skill that turns an Airbnb listing into a cinematic, room-by-room walkthrough video — Apify scrapes the photos, Higgsfield animates each room, ffmpeg stitches them into a finished tour.",
+  "name": "walkthrough-pro",
+  "version": "0.3.0",
+  "description": "Claude Code skill that turns any photo source — an Airbnb / Booking listing URL or your own images — into a cinematic walkthrough or ad video. Apify scrapes when there's a listing, Higgsfield animates every shot, ffmpeg stitches the final cut. Built for STR marketing, product ads, and business promos.",
   "keywords": [
     "claude-code",
     "claude",
     "skill",
     "short-term-rental",
     "airbnb",
-    "str-marketing",
+    "booking",
+    "product-ads",
+    "business-ads",
     "listing-video",
     "walkthrough",
     "higgsfield",
     "seedance",
     "apify",
     "ffmpeg",
-    "ai-video"
+    "ai-video",
+    "cinematic-ads"
   ],
   "homepage": "https://github.com/GiancarloLazazzera/re-walkthrough-pro#readme",
   "bugs": {

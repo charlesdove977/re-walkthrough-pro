@@ -32,6 +32,8 @@ For each room photo, build the motion prompt by consulting the sibling skills:
 
 ## Room → Camera Move Mapping (RE Camera Movement Library)
 
+*Use this section when `subject_type = str_listing` (Airbnb / Booking / self-managed).*
+
 | Room / shot | Named move (seedance-real-estate) | Note for image-to-video |
 |-------------|-----------------------------------|--------------------------|
 | Exterior / establishing | DRONE AERIAL APPROACH (or GIMBAL GLIDE along facade) | slow approach toward entry; compress to ~5s |
@@ -51,6 +53,52 @@ For each room photo, build the motion prompt by consulting the sibling skills:
 | Outdoor / backyard / pool | DRONE AERIAL APPROACH or LATERAL CRANE | rising reveal closer |
 | Detail (marble, fixtures, joinery) | PULLBACK/PUSH-IN REVEAL + SUBTLE FOCUS SHIFT | craftsmanship |
 
+## Product Ad Camera Moves
+
+*Use this section when `subject_type = product_ad`.*
+
+Product ads read premium when the camera does one clean, unambiguous move that highlights *the object*, not the room around it. Keep moves short and tight — a product clip has ~5 seconds to sell.
+
+| Shot role | Named move | Note for image-to-video |
+|-----------|------------|--------------------------|
+| Hero front | SLOW PUSH-IN | Straight-on approach; product fills more of the frame by the end. Do NOT change perspective. |
+| 3/4 angle | GENTLE ORBIT (short arc) | ~15–20° arc around the product, held near-horizontal. Reveals depth without warping. |
+| Side / back | LATERAL GLIDE | Slow horizontal drift; keeps proportions intact where a full orbit would drift the shape. |
+| Macro detail (texture, logo, mechanism) | RACK-FOCUS PULL + MICRO PUSH-IN | Focus racks onto the detail while the camera creeps closer. Buttery. |
+| Feature callout (a specific part) | PARALLAX + SLIGHT TILT | Suggests dimensionality on a flat product shot; keep the parallax tiny (<5%). |
+| Lifestyle / in-use | SUBTLE HANDHELD PARALLAX | Adds "life" to a static hands-holding-product shot without pretending it's video footage. |
+| Ambient / scene-setter | SLOW PULLBACK REVEAL | Product first, context after — good opener or closer. |
+| Closer / logo card | HOLD + SUBTLE ZOOM | For the final frame if the user supplied a brand card; else skip. |
+
+**Product-specific rules:**
+- **Never re-describe the product in the prompt.** Especially not brand names — Higgsfield warps text. Overlay copy in the editor afterwards.
+- **No compound moves.** Orbit *or* push-in, never both in one clip.
+- **Keep orbits short.** More than ~25° drifts geometry, especially on packaging with printed text.
+- **Match the vibe.** Luxury → slow (≥3s to reach 80% of the move). Punchy DTC → faster start, still one move.
+
+## Business Ad Camera Moves
+
+*Use this section when `subject_type = business_ad` (restaurant, gym, salon, tour, workshop, clinic, etc.).*
+
+Business ads mix **place** (rooms, signage, atmosphere) and **activity** (people doing the thing you're selling). Blend the RE walkthrough grammar with a couple of activity-specific moves.
+
+| Shot role | Named move | Note for image-to-video |
+|-----------|------------|--------------------------|
+| Exterior / signage | DRONE AERIAL APPROACH or GIMBAL GLIDE toward the sign | Establishes place. Approach slow so the sign text doesn't bend. |
+| Interior wide | STEADICAM WALKTHROUGH or SMOOTH GLIDE | Sells the vibe of the space; human walking pace. |
+| Bar / counter / display | LATERAL GLIDE along the counter | Highlights craft, product selection, or menu. |
+| Activity in progress (barista, chef, trainer, stylist) | SHOULDER-FOLLOW (close, half-behind subject) or SLOW PUSH-IN | The moneymaker shot. Compresses "we do this well" into 5 seconds. |
+| Product / detail (dish, treatment, gear) | SLOW PUSH-IN + RACK FOCUS | Reveals craft. Same grammar as product-ad macro. |
+| Customer / vibe | GENTLE ORBIT or PARALLAX | Faces are risky in image-to-video — orbit slowly, keep the arc small. |
+| Ambient (steam, sparks, sunlight, plants) | SUBTLE PARALLAX + LIGHT DRIFT | Texture beats; use as connective tissue between hero shots. |
+| Closer (finished dish, hero product, "come back") | PULLBACK REVEAL or HOLD + SUBTLE ZOOM | Ends the ad on the takeaway. |
+
+**Business-specific rules:**
+- **Faces are the highest-risk element** in image-to-video. Prefer profile or back-of-head shots for activity beats; if a customer is facing camera, prefer parallax over orbit and keep the move tiny.
+- **Signage text bends** on aggressive moves. Approach signs slowly and keep the sign roughly centered.
+- **Match ad length to vibe.** Fine dining / spa / luxury → 8–10 shots, slow moves. Quick-service / gym / punchy retail → 6–8 shots, tighter moves.
+- **Cross-reference the RE mapping.** Any indoor room shot uses the RE walkthrough grammar above (living room ≈ dining floor, primary bath ≈ treatment room, etc.).
+
 ## Prompting Rules
 
 - **One move per clip.** Compound moves warp geometry. Single and slow.
@@ -61,18 +109,20 @@ For each room photo, build the motion prompt by consulting the sibling skills:
 
 ## Generation + Polling
 
-1. `generate_video` (image-to-video) per room photo with its authored motion prompt → job id.
-2. Dispatch all rooms, then poll `job_status` per id (don't block room N on N-1).
-3. Download each clip to `scenes/room-NN-{type}.mp4`, NN = walkthrough position.
+1. `generate_video` (image-to-video) per source photo with its authored motion prompt → job id.
+2. Dispatch all shots, then poll `job_status` per id (don't block shot N on N-1).
+3. Download each clip to `scenes/shot-NN-{role}.mp4`, NN = ordered position (walkthrough position for `str_listing`; ad-order position for `product_ad` / `business_ad`).
 
 ## Handling Bad Outputs
 
 | Symptom | Fix |
 |---------|-----|
-| Furniture melts / warps | Regenerate with a gentler, shorter move (orbit → short push-in) |
-| Doorway / window bends | Reduce move distance; prefer lateral glide over push-in for that room |
-| Clip too short to feel cinematic | Accept it — stitched short clips still read as a tour; never force one long generation |
-| One room keeps failing | Note it, skip after one retry; never block the property on one room |
+| Furniture / product melts / warps | Regenerate with a gentler, shorter move (orbit → short push-in) |
+| Doorway / window / packaging edge bends | Reduce move distance; prefer lateral glide over push-in for that shot |
+| Text on a sign / label / logo warps | Slow the move; approach text head-on rather than at an angle |
+| Face distorts on a person shot | Switch to a smaller move (parallax over orbit); crop tighter to hide the face if permissible |
+| Clip too short to feel cinematic | Accept it — stitched short clips still read as a tour/ad; never force one long generation |
+| One shot keeps failing | Note it, skip after one retry; never block the whole subject on one shot |
 
 ## Anti-Patterns
 
