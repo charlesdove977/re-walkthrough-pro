@@ -6,7 +6,7 @@ How to assemble the per-room Higgsfield clips into one finished walkthrough, and
 
 ## Walkthrough Order
 
-Concatenate in natural tour order, NOT the order Zillow returned photos:
+Concatenate in natural tour order, NOT the order the actor returned photos:
 
 ```
 exterior → entry/foyer → living → dining → kitchen → bedrooms → bathrooms → outdoor/backyard

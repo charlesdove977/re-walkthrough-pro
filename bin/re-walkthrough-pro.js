@@ -72,7 +72,7 @@ function install(opts) {
   console.log(`  ${target}`);
   console.log('');
   console.log(`Invoke from Claude Code with:  /${SKILL_NAME}`);
-  console.log(`Then paste a Zillow listing link, or say "find 5 listings in <place>".`);
+  console.log(`Then paste an Airbnb listing link, or say "find 5 listings in <place>".`);
   console.log('');
   console.log(`Requires: Higgsfield MCP + Apify MCP connected in Claude Code, and ffmpeg installed.`);
 }
@@ -117,7 +117,7 @@ Examples:
   npx re-walkthrough-pro uninstall
 
 Skill name once installed: /${SKILL_NAME}
-Repo:                       https://github.com/charlesdove977/re-walkthrough-pro
+Repo:                       https://github.com/GiancarloLazazzera/re-walkthrough-pro
 `);
 }
 

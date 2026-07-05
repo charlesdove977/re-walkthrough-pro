@@ -1,22 +1,22 @@
 <purpose>
-Take a Zillow listing (a pasted link, an address, or one discovered via search) and produce a finished cinematic room-by-room walkthrough video. Scrapes the listing + photos via Apify, animates curated rooms with the Higgsfield MCP, stitches the clips with ffmpeg, and writes everything into a predictable per-property folder.
+Take an Airbnb listing (a pasted link, or one discovered via search) and produce a finished cinematic room-by-room walkthrough video. Scrapes the listing + photos via Apify, animates curated rooms with the Higgsfield MCP, stitches the clips with ffmpeg, and writes everything into a predictable per-listing folder.
 </purpose>
 
 <user-story>
-As a creator selling media to real estate agents, I want one command that turns a listing into a cinematic walkthrough, so that I can produce a sellable tour in minutes instead of manually scraping, prompting, and editing.
+As a creator selling media to short-term-rental hosts and property managers, I want one command that turns a listing into a cinematic walkthrough, so that I can produce a sellable tour in minutes instead of manually scraping, prompting, and editing.
 </user-story>
 
 <when-to-use>
-- User pastes a Zillow listing URL or address and wants a walkthrough
-- User wants to discover listings ("find 5 in NJ") then build from one
-- Entry point routes here via /listing-walkthrough
+- User pastes an Airbnb listing URL and wants a walkthrough
+- User wants to discover listings ("find 5 in Lisbon") then build from one
+- Entry point routes here via /re-walkthrough-pro
 </when-to-use>
 
 <references>
-@frameworks/apify-zillow-actors.md (during resolve_listing — actor IDs, inputs, chaining)
+@frameworks/apify-airbnb-actors.md (during resolve_listing — actor IDs, inputs, chaining)
 @frameworks/higgsfield-camera-moves.md (during animate_rooms — room→camera-move mapping + prompts)
 @frameworks/stitch-pipeline.md (during stitch_and_reframe — ffmpeg concat + reframe)
-@templates/property-md.md (during persist_property — PROPERTY.md shape)
+@templates/property-md.md (during persist_listing — PROPERTY.md shape)
 @checklists/walkthrough-quality.md (during review_and_deliver — pre-delivery QA)
 </references>
 
@@ -26,19 +26,18 @@ As a creator selling media to real estate agents, I want one command that turns 
 Determine what we're building from. Ask the user (if not already clear from how they invoked the skill):
 
 1. **Do you have a specific listing, or want me to find some?**
-   - A Zillow listing URL → single-property path
-   - An address → single-property path (use the actor's `addresses` input)
-   - "Find me listings" → discovery path (ask: location + how many, e.g. "5 single-family homes in Montclair NJ")
+   - An Airbnb listing URL (`https://www.airbnb.com/rooms/…`) → single-listing path
+   - "Find me listings" → discovery path (ask: location + how many + optional check-in/out + guests, e.g. "5 apartments in Lisbon for 2 guests")
 
 **Wait for response.**
 
 <if condition="discovery path">
-Load @frameworks/apify-zillow-actors.md. Run the search/zip actor for the requested location + count. Present the found listings as a table (address · price · beds/baths · sqft · photo count). Ask the user to pick one (or more, processed one at a time).
+Load @frameworks/apify-airbnb-actors.md. Run the search actor for the requested location + count. Present the found listings as a table (title · nightly price · bedrooms/bathrooms · max guests · photo count · rating). Ask the user to pick one (or more, processed one at a time).
 
 **Wait for selection.**
 </if>
 
-Confirm the final property/properties and the listing status (FOR_SALE / RECENTLY_SOLD / FOR_RENT — needed by the detail scraper; default FOR_SALE for active listings).
+Confirm the final listing/listings. Airbnb has no listing-status axis (no FOR_SALE / RECENTLY_SOLD) — do not ask for one.
 </step>
 
 <step name="collect_creative_choices">
@@ -57,41 +56,42 @@ State the rough cost before running: detail scrape (~$0.004) + N Higgsfield clip
 </step>
 
 <step name="resolve_listing">
-Load @frameworks/apify-zillow-actors.md.
+Load @frameworks/apify-airbnb-actors.md.
 
-Resolve the property to structured data + photo URLs via the Apify MCP:
-- URL path → call `maxcopell/zillow-detail-scraper` with `startUrls`.
-- Address path → same actor with `addresses`.
-- Discovery path → chain the search actor's dataset into the detail scraper via `searchResultsDatasetId`.
+Resolve the listing to structured data + photo URLs via the Apify MCP:
+- URL path → call `nomad-agent/airbnb-scraper` in `mode: "detail"` with `listingUrls`.
+- Discovery path → chain the search-mode run's dataset into a detail-mode run via `searchResultsDatasetId`.
 
 Use the Apify MCP `call-actor` tool (fetch the actor's input schema first if unsure). Retrieve the run's dataset items.
 
-Verify you got: full address, price, beds/baths/sqft, year built, agent info, and a non-empty list of image URLs. If image URLs are missing or sparse, fall back to `burbn/zillow-property-images-scraper` with `propertyUrls` for the photos.
+Verify you got: title, full address + coordinates, nightly price, bedrooms/bathrooms/max-guests, property type, host info, amenities, and a non-empty list of image URLs. If image URLs are missing or sparse, fall back to `tri_angle/airbnb-rooms-urls-scraper` with `listingUrls` for the photos.
 
-Derive a `{property-slug}` from the address (kebab-case, e.g. `17-zelma-dr-greenville-sc-29617`).
+Derive a `{listing-slug}` from the title + city (kebab-case, e.g. `sunny-loft-alfama-lisbon-12345678`, keeping the trailing Airbnb room id for uniqueness).
 </step>
 
-<step name="persist_property">
+<step name="persist_listing">
 Load @templates/property-md.md.
 
-Create the property folder tree under the output root `listing-walkthroughs/{property-slug}/`:
+Create the listing folder tree under the output root `listing-walkthroughs/{listing-slug}/`:
 - `source-images/` — download every photo URL here (use Bash `curl`/`wget`; name `NN-original.jpg` in returned order).
 - `scenes/` — created now, filled in animate_rooms.
 - `final/` — created now, filled in stitch_and_reframe.
 
-Write `listing-walkthroughs/{property-slug}/PROPERTY.md` from the template: address, Zillow link, price, beds/baths/sqft, year, agent, full room/photo list, and the run's creative choices.
+Write `listing-walkthroughs/{listing-slug}/PROPERTY.md` from the template: title, Airbnb link, nightly price, bedrooms/bathrooms/max-guests, property type, host, amenities highlights, full photo list, and the run's creative choices.
 </step>
 
 <step name="curate_rooms">
+Airbnb does **not** label rooms in its photo array — the caption field is host-authored and inconsistent. All room-type assignment here is vision-based; do not trust actor-returned captions.
+
 <if condition="rooms = auto-curate">
-Do a vision pass over `source-images/`: Read the images, pick the single best photo per distinct room, drop floorplans, maps, aerial-only, watermark-heavy, and near-duplicate shots. Target the hero set: exterior, entry/foyer, living, kitchen, primary bed, primary bath, one secondary bed, and a backyard/outdoor shot when present (~6–10 total). Tag each kept photo with its room type.
+Do a vision pass over `source-images/`: Read the images, pick the single best photo per distinct room, drop floorplans, maps, aerial-only, watermark-heavy, and near-duplicate shots. Target the hero set: exterior/building, entry/hallway, living, kitchen, primary bed, primary bath, one secondary bed, and a balcony/pool/outdoor shot when present (~6–10 total). Cross-check the `amenities` list from the actor — if it lists "pool", "hot tub", "workspace", "balcony", ensure that photo is not dropped as a duplicate. Tag each kept photo with its room type.
 </if>
 
 <if condition="rooms = all">
-Use every non-floorplan photo, tagging each with its best-guess room type for camera-move selection.
+Use every non-floorplan photo, tagging each with its best-guess room type (vision-only) for camera-move selection.
 </if>
 
-Produce an ordered shot list: [photo file, room type, walkthrough position]. Walkthrough order = exterior → entry → living → kitchen → bedrooms → bathrooms → outdoor, regardless of Zillow's photo order.
+Produce an ordered shot list: [photo file, room type, walkthrough position]. Walkthrough order = exterior → entry → living → kitchen → bedrooms → bathrooms → outdoor/amenity, regardless of the actor's photo order.
 </step>
 
 <step name="animate_rooms">
@@ -127,7 +127,7 @@ Verify each final file exists, is non-zero, and plays start-to-finish with the e
 Load @checklists/walkthrough-quality.md and validate the output against it.
 
 Report to the user:
-- Final video path(s) under `listing-walkthroughs/{property-slug}/final/`
+- Final video path(s) under `listing-walkthroughs/{listing-slug}/final/`
 - Scene count + any rooms that were skipped/failed
 - `PROPERTY.md` path
 - Rough Higgsfield credit + Apify cost spent
@@ -145,9 +145,9 @@ A finished cinematic walkthrough video plus a complete per-property asset folder
 
 ## Structure
 ```
-listing-walkthroughs/{property-slug}/
-├── PROPERTY.md                 address · link · price · specs · agent · room list · run notes
-├── source-images/              every photo pulled from Zillow (NN-original.jpg)
+listing-walkthroughs/{listing-slug}/
+├── PROPERTY.md                 title · link · nightly price · specs · host · room list · run notes
+├── source-images/              every photo pulled from Airbnb (NN-original.jpg)
 ├── scenes/                     per-room Higgsfield clips (room-NN-{type}.mp4)
 └── final/                      walkthrough-16x9.mp4 (+ walkthrough-9x16.mp4 if requested)
 ```
@@ -158,7 +158,7 @@ Output root: `listing-walkthroughs/` at repo root.
 
 <acceptance-criteria>
 - [ ] Listing resolved to structured data + non-empty photo set via Apify
-- [ ] PROPERTY.md written with address, link, specs, agent, and creative choices
+- [ ] PROPERTY.md written with title, Airbnb link, specs, host, amenities, and creative choices
 - [ ] All source photos downloaded to source-images/
 - [ ] Each curated room produced one clip in scenes/, ordered by walkthrough position
 - [ ] final/ contains a playable master that runs start-to-finish in correct room order

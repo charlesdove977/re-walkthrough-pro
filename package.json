@@ -1,30 +1,29 @@
 {
-  "name": "re-walkthrough-pro",
-  "version": "0.1.0",
-  "description": "Claude Code skill that turns a Zillow listing into a cinematic, room-by-room property walkthrough video — Apify scrapes the photos, Higgsfield animates each room, ffmpeg stitches the final cut. Built to sell to real estate agents.",
+  "name": "airbnb-walkthrough-pro",
+  "version": "0.2.0",
+  "description": "Claude Code skill that turns an Airbnb listing into a cinematic, room-by-room walkthrough video — Apify scrapes the photos, Higgsfield animates each room, ffmpeg stitches them into a finished tour.",
   "keywords": [
     "claude-code",
     "claude",
     "skill",
-    "real-estate",
-    "zillow",
-    "property-video",
+    "short-term-rental",
+    "airbnb",
+    "str-marketing",
     "listing-video",
     "walkthrough",
     "higgsfield",
     "seedance",
     "apify",
     "ffmpeg",
-    "ai-video",
-    "real-estate-marketing"
+    "ai-video"
   ],
-  "homepage": "https://github.com/charlesdove977/re-walkthrough-pro#readme",
+  "homepage": "https://github.com/GiancarloLazazzera/re-walkthrough-pro#readme",
   "bugs": {
-    "url": "https://github.com/charlesdove977/re-walkthrough-pro/issues"
+    "url": "https://github.com/GiancarloLazazzera/re-walkthrough-pro/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/charlesdove977/re-walkthrough-pro.git"
+    "url": "git+https://github.com/GiancarloLazazzera/re-walkthrough-pro.git"
   },
   "license": "MIT",
   "author": "Charles J Dove",
