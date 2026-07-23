@@ -19,10 +19,16 @@ Validates a finished property walkthrough before delivering it to an agent.
 - [ ] Each clip uses one slow camera move (no fast or compound moves)
 - [ ] Exterior opens the tour; an outdoor/backyard shot closes it when available
 - [ ] No floorplans, maps, or watermark-heavy photos animated as rooms
+- [ ] **No source photo with on-screen text** (watermark, agent badge, price banner, "For Sale"/"Coming Soon" overlay, MLS stamp, logo) was animated — texted photos were deleted from source-images/, not used
+- [ ] No baked-in text appears anywhere in any scene or the final master
 
 ## Truth-in-Claims
 - [ ] Asset is described as a "cinematic walkthrough," not "3D" or "Matterport"
 - [ ] Master is silent (v1) — no accidental audio baked in
+
+## Approval
+- [ ] User was asked directly "Do you like the walkthrough?" — not just handed the file
+- [ ] Any room they disliked was redone from scenes/ and the master rebuilt into final/
 
 ## Scoring
 

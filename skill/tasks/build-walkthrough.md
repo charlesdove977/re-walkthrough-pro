@@ -83,12 +83,14 @@ Write `listing-walkthroughs/{property-slug}/PROPERTY.md` from the template: addr
 </step>
 
 <step name="curate_rooms">
+**Text screen (HARD RULE — run first).** Vision-pass every photo in `source-images/` for baked-in on-screen text: brokerage/agent watermarks, agent name or headshot badges, price banners, "Coming Soon" / "For Sale" / "Just Listed" overlays, MLS stamps, logos, tour-company bugs. Any photo with such text is **unusable** — `Bash rm` it from `source-images/` immediately; never animate it and never let it reach a scene or the final video. If removing a texted photo leaves a needed room with no clean shot, tell the user and ask for a clean replacement rather than using the texted one. Log removed files in PROPERTY.md.
+
 <if condition="rooms = auto-curate">
-Do a vision pass over `source-images/`: Read the images, pick the single best photo per distinct room, drop floorplans, maps, aerial-only, watermark-heavy, and near-duplicate shots. Target the hero set: exterior, entry/foyer, living, kitchen, primary bed, primary bath, one secondary bed, and a backyard/outdoor shot when present (~6–10 total). Tag each kept photo with its room type.
+Do a vision pass over the surviving `source-images/`: Read the images, pick the single best photo per distinct room, drop floorplans, maps, aerial-only, and near-duplicate shots. Target the hero set: exterior, entry/foyer, living, kitchen, primary bed, primary bath, one secondary bed, and a backyard/outdoor shot when present (~6–10 total). Tag each kept photo with its room type.
 </if>
 
 <if condition="rooms = all">
-Use every non-floorplan photo, tagging each with its best-guess room type for camera-move selection.
+Use every clean, non-floorplan photo, tagging each with its best-guess room type for camera-move selection.
 </if>
 
 Produce an ordered shot list: [photo file, room type, walkthrough position]. Walkthrough order = exterior → entry → living → kitchen → bedrooms → bathrooms → outdoor, regardless of Zillow's photo order.
@@ -97,13 +99,13 @@ Produce an ordered shot list: [photo file, room type, walkthrough position]. Wal
 <step name="animate_rooms">
 Load @frameworks/higgsfield-camera-moves.md.
 
-The prompt craft is **model-agnostic** (applies to whichever Higgsfield video model you chose: Seedance 2.0, Kling 3.0, or any future model). Two OPTIONAL sibling skills enrich the wording when present:
+The prompt craft comes from two sibling skills — they are **model-agnostic** (apply to whichever Higgsfield video model you chose: Seedance 2.0, Kling 3.0, or any future model):
 - **`seedance-real-estate`** — Camera Movement Library, Room-by-Room Showcase Strategy, Lighting & Time-of-Day Guide.
 - **`seedance-cinematic`** — film-look layer (color grade, atmosphere, depth), used when style = cinematic.
 
 For each shot in the list, generate one clip via the Higgsfield MCP:
-1. Pick the room's camera move from the framework mapping in `higgsfield-camera-moves.md` (this mapping is self-sufficient on its own).
-2. **Author the motion prompt.** If `seedance-real-estate` is installed, invoke it for the move wording + room cue + lighting; if style = cinematic and `seedance-cinematic` is installed, layer its grade/atmosphere. If neither is installed, build the prompt directly from the framework mapping + prompting rules — it is enough. Either way: apply only the camera-move + lighting layers ON the photo — do NOT re-describe the room (image-to-video carries the scene). Compress the move to the ~5s clip length; one move per clip.
+1. Pick the room's camera move from the framework mapping (named moves from `seedance-real-estate`).
+2. **Author the motion prompt** by invoking `seedance-real-estate` (move wording + room cue + lighting); if style = cinematic, also invoke `seedance-cinematic` and layer its grade/atmosphere. Apply only the camera-move + lighting layers ON the photo — do NOT re-describe the room (image-to-video carries the scene). Compress the move to the ~5s clip length; one move per clip.
 3. (Optional) Call `models_explore` to confirm the best model for the shot; otherwise use the chosen engine.
 4. Call `generate_video` as image-to-video, passing the room photo + the authored motion prompt, at the master ratio (16:9 unless 9:16-only was selected).
 5. Capture the returned job id.
@@ -132,9 +134,11 @@ Report to the user:
 - `PROPERTY.md` path
 - Rough Higgsfield credit + Apify cost spent
 
-Ask: "Walkthrough ready — want any room regenerated, a different ratio, or this batched across more listings?"
+**Approval loop (ALWAYS ask — do not skip).** Ask directly: **"Do you like the walkthrough?"**
+- **Yes** → offer a different ratio or batching across more listings, then finish.
+- **No** → ask them to name the room in `scenes/` they didn't like (e.g. `room-04-kitchen.mp4`). Regenerate ONLY that scene (gentler / adjusted camera move, or a different clean source photo), re-run the stitch pipeline to rebuild the master, and write the new master into `final/`. Then ask again — repeat until they approve.
 
-**Wait for approval or revision requests.**
+**Wait for approval or a named room to redo.**
 </step>
 
 </steps>

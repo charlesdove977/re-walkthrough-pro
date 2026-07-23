@@ -1,11 +1,15 @@
 ---
 name: re-walkthrough-pro
 type: standalone
-version: 0.1.0
+version: 0.2.0
 category: content
 description: Turn a Zillow listing into a cinematic room-by-room walkthrough video (Apify scrape → Higgsfield image-to-video → ffmpeg stitch) to sell to real estate agents
+repository: https://github.com/charlesdove977/re-walkthrough-pro
 allowed-tools: [Read, Write, Bash, Glob, Grep, AskUserQuestion]
 ---
+
+<!-- Published as RE Walkthrough Pro — https://github.com/charlesdove977/re-walkthrough-pro (npm: re-walkthrough-pro) -->
+
 
 <activation>
 ## What
@@ -13,8 +17,8 @@ Turns a Zillow listing into a cinematic, room-by-room property walkthrough video
 
 ## When to Use
 - You have a Zillow listing link (or want to discover listings) and want a sellable cinematic walkthrough
+- Executing the Higgsfield MCP "Earning Series" Track 1 (Real Estate → walkthroughs)
 - Producing a batch of property tours to pitch to local agents
-- Adding a video-walkthrough line item to a real estate marketing service
 
 ## Not For
 - True 3D / Matterport reconstruction — Higgsfield does cinematic camera moves on photos, not spatial reconstruction
@@ -39,6 +43,12 @@ Real estate content producer — turns raw listing photos into premium cinematic
 - ffmpeg stitching and aspect-ratio reframing
 </persona>
 
+<hard-rules>
+## Non-negotiable rules (every run)
+1. **Pulled photos must have NO on-screen text.** Any source photo with a baked-in watermark, agent name/headshot badge, price banner, "Coming Soon"/"For Sale"/"Just Listed" overlay, MLS stamp, logo, or tour-company bug is unusable — delete it from `source-images/` during curation, never animate it, never let it appear in a scene or the final video. If that loses the only shot of a needed room, ask the user for a clean replacement.
+2. **Always ask if they like the output.** After delivery, ask "Do you like the walkthrough?" If not, have them name the room in `scenes/` they didn't like, regenerate only that scene, rebuild the master, and drop the new master in `final/`. Repeat until approved.
+</hard-rules>
+
 <commands>
 | Command | Description | Routes To |
 |---------|-------------|-----------|
@@ -56,10 +66,10 @@ Real estate content producer — turns raw listing photos into premium cinematic
 @templates/property-md.md (when writing each property's PROPERTY.md)
 @checklists/walkthrough-quality.md (before declaring a walkthrough done)
 
-## Optional Sibling Skills (prompt-craft enrichment, model-agnostic)
-- `seedance-real-estate` — Camera Movement Library + Room-by-Room Strategy + Lighting Guide; richer per-room motion prompts
-- `seedance-cinematic` — film-look layer (color grade, atmosphere) when style = cinematic
-- OPTIONAL: if installed, the skill invokes them for richer prompt wording. If not, the built-in camera-move mapping in `frameworks/higgsfield-camera-moves.md` is self-sufficient. Both ship inside UGC Factory (npm: `ugc-factory`). These supply prompt craft for ANY Higgsfield video model (Seedance 2.0, Kling 3.0, future).
+## Sibling Skills (prompt-craft layer, model-agnostic)
+- `seedance-real-estate` — Camera Movement Library + Room-by-Room Strategy + Lighting Guide; authors each room's motion prompt
+- `seedance-cinematic` — film-look layer (color grade, atmosphere) stacked when style = cinematic
+- These supply prompt craft for ANY chosen Higgsfield video model (Seedance 2.0, Kling 3.0, future)
 </routing>
 
 <greeting>
