@@ -20,6 +20,8 @@ A finished tour that looks like a $1,000–3,000 production, made from listing p
 
 > **Honest framing:** This produces a *cinematic walkthrough* (per-room camera-move clips stitched together), **not** a true 3D / Matterport reconstruction. It looks premium, and it's impossible without an AI video engine — but don't promise a walkable dollhouse.
 
+Step-by-step guide and setup walkthrough: [RE Walkthrough Pro guide on charlieautomates.com](https://charlieautomates.com/resources/re-walkthrough-pro/)
+
 ---
 
 ## Why
@@ -176,3 +178,5 @@ The Apify scrape is sub-cent per property. The real cost is Higgsfield credits, 
 ## License
 
 MIT — see [LICENSE](LICENSE). Built by [Charles J Dove](https://www.charlieautomates.com).
+
+More free Claude Code tools: [charlieautomates.com](https://charlieautomates.com/free-resources/)
