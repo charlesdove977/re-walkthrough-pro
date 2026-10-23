@@ -20,6 +20,8 @@ A finished tour that looks like a $1,000–3,000 production, made from listing p
 
 > **Honest framing:** This produces a *cinematic walkthrough* (per-room camera-move clips stitched together), **not** a true 3D / Matterport reconstruction. It looks premium, and it's impossible without an AI video engine — but don't promise a walkable dollhouse.
 
+**Want listing videos like this made for you on autopilot?** Join [CC Strategic AI +](https://www.skool.com/cc-strategic-ai-plus/about): my 27-day Claude Code mastery program with a 1-click install setup file, and you work with us to land your first AI client in 90 days, or your money back.
+
 Step-by-step guide and setup walkthrough: [RE Walkthrough Pro guide on charlieautomates.com](https://charlieautomates.com/resources/re-walkthrough-pro/)
 
 ---
@@ -179,4 +181,4 @@ The Apify scrape is sub-cent per property. The real cost is Higgsfield credits, 
 
 MIT — see [LICENSE](LICENSE). Built by [Charles J Dove](https://www.charlieautomates.com).
 
-More free Claude Code tools: [charlieautomates.com](https://charlieautomates.com/free-resources/)
+More free Claude Code tools: [charlieautomates.com](https://charlieautomates.com/free-resources/) · Go deeper inside [CC Strategic AI +](https://www.skool.com/cc-strategic-ai-plus/about)
